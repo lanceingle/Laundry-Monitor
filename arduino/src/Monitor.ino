@@ -9,11 +9,11 @@
 #define EMAIL "EMAIL_1"
 #define EMAIL_2 "EMAIL_2"
 
+#define ANNOY_INTERVAL 300000 // 5 mins in millis
 #define WASHER_PIN D1
 #define DRYER_PIN D2
 
 #define EMAIL_RETRIES 3
-
 
 #pragma region Globals
 uint8_t connection_state = 0;                    // Connected to WIFI or not
@@ -104,17 +104,18 @@ void setup () {
   Serial.begin(115200);
   Serial.println("Started up");
 
-  sendDoneNotification("System has started up.");
+  sendDoneNotification("Laundry System has started up.");
 }
 
 void loop () {
   if (washer->hasStopped()) {
-    sendDoneNotification("Washer has stopped running.");
+    delay(3000); // Sleep for 3 seconds
+    while (dryer->hasStarted() == false) {
+      delay(ANNOY_INTERVAL);
+      if (dryer->hasStarted() == false) {
+        sendDoneNotification("Flip the laundry");
+      }
+    }
   }
-
-  if (dryer->hasStopped()) {
-    sendDoneNotification("Dryer has stopped running.");
-  }
-
   delay(5);
 }
