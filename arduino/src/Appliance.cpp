@@ -12,6 +12,11 @@ Appliance::Appliance(int pin)
   tripBucketLastDripped = 0;
 }
 
+bool Appliance::hasStarted()
+{
+  return machineRunning;
+}
+
 bool Appliance::hasStopped()
 {
   int now = millis();

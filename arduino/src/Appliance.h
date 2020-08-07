@@ -13,6 +13,7 @@ class Appliance
   public:
     Appliance(int pin);
     bool hasStopped();
+    bool hasStarted();
   private:
     int _pin;
     bool machineRunning;
