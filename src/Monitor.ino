@@ -1,13 +1,14 @@
 #include <String.h>
 #include <ESP8266WiFi.h>
-#include "Gsender.h"
+#include "ESP8266SMTP.h"
 #include "Appliance.h"
 
 #define WIFI_SSID "SSID"
 #define WIFI_PASSWORD "PASSWORD"
+#define FROM_EMAIL "something@gmail.com"
+#define GMAIL_PASSWORD "PASSWORD"
 #define EMAIL_SUBJECT "Laundry Notification"
-#define EMAIL "EMAIL_1"
-#define EMAIL_2 "EMAIL_2"
+#define TO_EMAIL "EMAIL1,EMAIL2" // you can add commas here
 
 #define ANNOY_INTERVAL 300000 // 5 mins in millis
 #define WASHER_PIN D1
@@ -84,17 +85,19 @@ void sendDoneNotification(String message) {
   delay(1000);
 
   Serial.println("Connected to WiFi");
-  Gsender *gsender = Gsender::Instance();    // Getting pointer to class instance
-  String subject = EMAIL_SUBJECT;
-  for (size_t i = 0; i < EMAIL_RETRIES; i++) {
-    if(gsender->Subject(EMAIL_SUBJECT)->Send(EMAIL, EMAIL_2, message)) {
-      Serial.println("Message sent");
-      break;
-    } else {
-      Serial.print("Error sending message: ");
-      Serial.println(gsender->getError());
-    }
-  }
+
+  SMTP.setEmail(FROM_EMAIL)
+		.setPassword(GMAIL_PASSWORD)
+		.Subject(EMAIL_SUBJECT)
+		.setFrom("Laundry Bot")
+		.setForGmail();						// simply sets port to 465 and setServer("smtp.gmail.com");						
+																   // message text from http://www.blindtextgenerator.com/lorem-ipsum
+	if(SMTP.Send(TO_EMAIL, message)) {
+		Serial.println(F("Message sent"));
+	} else {
+		Serial.print(F("Error sending message: "));
+		Serial.println(SMTP.getError());
+	}
 }
 
 void setup () {
